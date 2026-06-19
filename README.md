@@ -57,17 +57,11 @@ Optimized for smooth performance and a seamless user experience.
 
 ---
 
-## 📱 Screenshots
+## 📱 App Preview
 
 <p align="center">
-  Add your screenshots here
+  <img src="assets/dotty_poster.png" alt="Dotty App Preview" width="100%">
 </p>
-
-| Home       | Search     | Favorites  |
-| ---------- | ---------- | ---------- |
-| Screenshot | Screenshot | Screenshot |
-
----
 
 ## 🛠️ Built With
 
