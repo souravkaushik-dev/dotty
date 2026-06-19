@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/github_banner.png" alt="Dotty Banner" width="100%">
+  <img src="assets/dotty-lands.png" alt="Dotty Banner" width="100%">
 </p>
 
 <h1 align="center">Dotty</h1>
