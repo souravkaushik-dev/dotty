@@ -68,9 +68,8 @@ Optimized for smooth performance and a seamless user experience.
 * Flutter
 * Dart
 * Provider
-* REST API Integration
+* API Integration
 * Shared Preferences
-* Sqflite
 * Flutter Dotenv
 
 ---
