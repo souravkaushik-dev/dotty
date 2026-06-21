@@ -1,13 +1,13 @@
-import 'dart:ui';
-
 import 'package:dotty/models/category_model.dart';
 import 'package:dotty/screens/favorite_screen.dart';
 import 'package:dotty/screens/recent_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hicons/flutter_hicons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:liquid_glass_easy/liquid_glass_easy.dart';
 
 import '../api_servie/wallpaper_Api.dart';
 import 'home_screen.dart';
@@ -21,64 +21,42 @@ class MainScreen extends StatefulWidget {
   });
 
   @override
-  State<MainScreen> createState() =>
-      _MainScreenState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-
   int currentTab = 0;
-
-  final Color accent = Colors.black;
 
   late List<Wallpaper> recentWallpapers;
 
   @override
   void initState() {
     super.initState();
-
-    recentWallpapers =
-    List<Wallpaper>.from(
-      widget.recentWallpapers,
-    );
+    recentWallpapers = List<Wallpaper>.from(widget.recentWallpapers);
   }
 
-
-  int get recentCount {
-    if (recentWallpapers.isEmpty) {
-      return 0;
-    }
-
-    return recentWallpapers.length >= 20
-        ? recentWallpapers.length
-        : recentWallpapers.length;
-  }
-
-
+  @override
   @override
   Widget build(BuildContext context) {
     final isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
+        Theme.of(context).brightness == Brightness.dark;
 
     final bg = isDark
         ? const Color(0xFF0F1115)
         : const Color(0xFFF7F8FC);
 
+    final accent =
+    isDark ? Colors.white : Colors.black;
+
     final secondary =
     isDark ? Colors.white60 : Colors.black54;
 
-    final List<Widget> pages = [
+    final pages = [
       const HomeScreen(),
-
       const CategoriesPage(),
-
       const SavedScreen(),
-
       RecentPage(
-        recentWallpapers:
-        recentWallpapers,
-
+        recentWallpapers: recentWallpapers,
         onUpdate: (updatedList) {
           setState(() {
             recentWallpapers = updatedList;
@@ -87,272 +65,195 @@ class _MainScreenState extends State<MainScreen> {
       ),
     ];
 
-    return Scaffold(
-      backgroundColor: bg,
+    return LiquidGlassView(
+      backgroundWidget: pages[currentTab],
+      child: Scaffold(
+        backgroundColor: bg,
+        extendBody: true,
 
-      extendBody: true,
-
-      body: AnimatedSwitcher(
-        duration:
-        const Duration(milliseconds: 700),
-
-        switchInCurve: Curves.easeOutExpo,
-
-        switchOutCurve: Curves.easeOutExpo,
-
-        transitionBuilder:
-            (child, animation) {
-          return FadeTransition(
-            opacity: animation,
-
-            child: SlideTransition(
-              position:
-              Tween<Offset>(
-                begin: const Offset(
-                  0,
-                  .03,
-                ),
-
-                end: Offset.zero,
-              ).animate(
-                CurvedAnimation(
-                  parent: animation,
-
-                  curve:
-                  Curves.easeOutExpo,
-                ),
-              ),
-
-              child: child,
-            ),
-          );
-        },
-
-        child: KeyedSubtree(
-          key: ValueKey(currentTab),
-
-          child: pages[currentTab],
+        /// BODY
+        body: IndexedStack(
+          index: currentTab,
+          children: pages,
         ),
-      ),
 
-      // FLOATING NAVBAR
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding:
-          EdgeInsets.only(bottom: 14.h),
-
-          child: Row(
-            mainAxisAlignment:
-            MainAxisAlignment.center,
-
-            children: [
-              ClipRRect(
-                borderRadius:
-                BorderRadius.circular(
-                  40.r,
-                ),
-
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(
-                    sigmaX: 20,
-                    sigmaY: 20,
-                  ),
-
-                  child: Container(
-                    height: 76.h,
-
-                    padding:
-                    EdgeInsets.symmetric(
-                      horizontal: 12.w,
-
-                      vertical: 10.h,
-                    ),
-
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.white
-                          .withOpacity(
-                        .03,
-                      )
-                          : Colors.white
-                          .withOpacity(
-                        .10,
-                      ),
-
-                      borderRadius:
-                      BorderRadius.circular(
-                        40.r,
-                      ),
-
-                      border: Border.all(
-                        color: Colors.white
-                            .withOpacity(
-                          .05,
+        /// NAV BAR
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 14.h),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 76.h,
+                  child: LiquidGlassLens(
+                    style: LiquidGlassStyle(
+                      shape: LiquidGlassShape.squircle(
+                        cornerRadius: 40.r,
+                        borderType: OpticalBorder(
+                          borderSaturation: 1.6,
+                          ambientIntensity: 1.4,
                         ),
+                      ),
 
-                        width: .8,
+                      appearance: LiquidGlassAppearance(
+                        color: isDark
+                            ? Colors.white.withOpacity(.05)
+                            : Colors.white.withOpacity(.14),
+                      ),
+
+                      refraction: const LiquidGlassRefraction(
+                        distortion: .15,
+                        distortionWidth: 32,
+                        magnification: 1.03,
                       ),
                     ),
 
-                    child: Row(
-                      mainAxisSize:
-                      MainAxisSize.min,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 10.h,
+                      ),
 
-                      children: [
-                        _navItem(
-                          icon:
-                          Hicons
-                              .home3LightOutline,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
 
-                          label: "Home",
+                          /// HOME
+                          _navItem(
+                            icon: Hicons.home3LightOutline,
+                            label: "Home",
+                            selected: currentTab == 0,
+                            accent: accent,
+                            secondary: secondary,
+                            onTap: () {
+                              if (currentTab == 0) return;
+                              setState(() => currentTab = 0);
+                            },
+                          ),
 
-                          selected:
-                          currentTab ==
-                              0,
+                          SizedBox(width: 6.w),
 
-                          onTap: () {
-                            setState(() {
-                              currentTab = 0;
-                            });
-                          },
+                          /// BROWSE
+                          _navItem(
+                            icon: Hicons.categoryLightOutline,
+                            label: "Browse",
+                            selected: currentTab == 1,
+                            accent: accent,
+                            secondary: secondary,
+                            onTap: () {
+                              if (currentTab == 1) return;
+                              setState(() => currentTab = 1);
+                            },
+                          ),
 
-                          secondary:
-                          secondary,
-                        ),
+                          SizedBox(width: 6.w),
 
-                        SizedBox(
-                            width: 6.w),
+                          /// SAVED
+                          _navItem(
+                            icon: Hicons.heart3LightOutline,
+                            label: "Saved",
+                            selected: currentTab == 2,
+                            accent: accent,
+                            secondary: secondary,
+                            onTap: () {
+                              if (currentTab == 2) return;
+                              setState(() => currentTab = 2);
+                            },
+                          ),
 
-                        _navItem(
-                          icon:
-                          Hicons
-                              .categoryLightOutline,
+                          SizedBox(width: 6.w),
 
-                          label: "Browse",
+                          /// RECENT
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
 
-                          selected:
-                          currentTab ==
-                              1,
+                              _navItem(
+                                icon: Icons.history_rounded,
+                                label: "Recent",
+                                selected: currentTab == 3,
+                                accent: accent,
+                                secondary: secondary,
+                                onTap: () {
+                                  if (currentTab == 3) return;
+                                  setState(() => currentTab = 3);
+                                },
+                              ),
 
-                          onTap: () {
-                            setState(() {
-                              currentTab = 1;
-                            });
-                          },
-
-                          secondary:
-                          secondary,
-                        ),
-
-                        SizedBox(
-                            width: 6.w),
-
-                        _navItem(
-                          icon:
-                          Hicons
-                              .heart3LightOutline,
-
-                          label: "Saved",
-
-                          selected:
-                          currentTab ==
-                              2,
-
-                          onTap: () {
-                            setState(() {
-                              currentTab = 2;
-                            });
-                          },
-
-                          secondary:
-                          secondary,
-                        ),
-
-                        SizedBox(
-                            width: 6.w),
-
-                        // RECENT TAB
-                        Stack(
-                          children: [
-                            _navItem(
-                              icon:
-                              Icons
-                                  .history_rounded,
-
-                              label:
-                              "Recent",
-
-                              selected:
-                              currentTab ==
-                                  3,
-
-                              onTap: () {
-                                setState(
-                                      () {
-                                    currentTab =
-                                    3;
-                                  },
-                                );
-                              },
-
-                              secondary:
-                              secondary,
-                            ),
-
-                            if (recentWallpapers.isNotEmpty)
                               Positioned(
-                                right: 6,
-                                top: 4,
-
-                                child:
-                                Container(
-                                  padding:
-                                  const EdgeInsets.all(
-                                    5,
+                                right: -2,
+                                top: -2,
+                                child: AnimatedSwitcher(
+                                  duration: const Duration(
+                                    milliseconds: 500,
                                   ),
 
-                                  decoration:
-                                  const BoxDecoration(
-                                    color:
-                                    Colors.red,
+                                  transitionBuilder:
+                                      (child, animation) {
+                                    return ScaleTransition(
+                                      scale: CurvedAnimation(
+                                        parent: animation,
+                                        curve: Curves.elasticOut,
+                                      ),
+                                      child: child,
+                                    );
+                                  },
 
-                                    shape: BoxShape
-                                        .circle,
-                                  ),
-
-                                  child:
-                                  Text(
-                                    recentWallpapers.length.toString(),
-                                    style:
-                                    const TextStyle(
-                                      color:
-                                      Colors.white,
-
-                                      fontSize:
-                                      10,
-
-                                      fontWeight:
-                                      FontWeight.bold,
+                                  child: recentWallpapers.isNotEmpty
+                                      ? Container(
+                                    key: ValueKey(
+                                      recentWallpapers.length,
                                     ),
-                                  ),
+
+                                    padding:
+                                    const EdgeInsets.all(5),
+
+                                    decoration:
+                                    const BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                    ),
+
+                                    child: Text(
+                                      recentWallpapers.length
+                                          .toString(),
+
+                                      style:
+                                      const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight:
+                                        FontWeight.bold,
+                                      ),
+                                    ),
+                                  )
+                                      : const SizedBox.shrink(),
                                 ),
                               ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+                )
+                    .animate()
+                    .fadeIn(
+                  duration: 900.ms,
+                )
+                    .moveY(
+                  begin: 40,
+                  end: 0,
+                  curve: Curves.easeOutExpo,
+                )
+                    .scaleXY(
+                  begin: .95,
+                  end: 1,
+                  duration: 900.ms,
                 ),
-              )
-                  .animate()
-                  .fadeIn(duration: 700.ms)
-                  .moveY(
-                begin: 30,
-                end: 0,
-                curve:
-                Curves.easeOutExpo,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -363,91 +264,67 @@ class _MainScreenState extends State<MainScreen> {
     required IconData icon,
     required String label,
     required bool selected,
-    required VoidCallback onTap,
+    required Color accent,
     required Color secondary,
+    required VoidCallback onTap,
   }) {
     return GestureDetector(
-      onTap: onTap,
-
-      behavior:
-      HitTestBehavior.translucent,
-
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
+      behavior: HitTestBehavior.translucent,
       child: AnimatedContainer(
-        duration:
-        const Duration(milliseconds: 450),
-
+        duration: const Duration(milliseconds: 500),
         curve: Curves.easeOutExpo,
-
         padding: EdgeInsets.symmetric(
-          horizontal:
-          selected ? 18.w : 12.w,
-
+          horizontal: selected ? 18.w : 12.w,
           vertical: 10.h,
         ),
-
         decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24.r),
           color: selected
-              ? accent.withOpacity(.12)
+              ? Colors.white.withOpacity(.08)
               : Colors.transparent,
-
-          borderRadius:
-          BorderRadius.circular(24.r),
+          boxShadow: selected
+              ? [
+            BoxShadow(
+              blurRadius: 20,
+              spreadRadius: 1,
+              color: accent.withOpacity(.08),
+            ),
+          ]
+              : [],
         ),
-
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             AnimatedScale(
-              duration:
-              const Duration(milliseconds: 350),
-
-              curve: Curves.easeOutExpo,
-
-              scale: selected ? 1.08 : 1,
-
+              duration: const Duration(milliseconds: 450),
+              curve: Curves.easeOutBack,
+              scale: selected ? 1.12 : 1,
               child: Icon(
                 icon,
-
-                color:
-                selected
-                    ? accent
-                    : secondary,
-
                 size: 24.sp,
+                color: selected ? accent : secondary,
               ),
             ),
-
             AnimatedSize(
-              duration:
-              const Duration(milliseconds: 350),
-
+              duration: const Duration(milliseconds: 450),
               curve: Curves.easeOutExpo,
-
               child: selected
-                  ? Row(
-                children: [
-                  SizedBox(
-                      width: 10.w),
-
-                  Text(
-                    label,
-
-                    style:
-                    GoogleFonts.inter(
-                      color: accent,
-
-                      fontWeight:
-                      FontWeight
-                          .w600,
-
-                      fontSize: 13.sp,
-
-                      letterSpacing:
-                      -.2,
-                    ),
+                  ? Padding(
+                padding: EdgeInsets.only(left: 10.w),
+                child: Text(
+                  label,
+                  style: GoogleFonts.inter(
+                    color: accent,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13.sp,
                   ),
-                ],
+                ),
               )
-                  : const SizedBox(),
+                  : const SizedBox.shrink(),
             ),
           ],
         ),
