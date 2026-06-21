@@ -3,11 +3,13 @@ import 'dart:ui';
 import 'package:dotty/screens/privacy_policy.dart';
 import 'package:dotty/screens/terms_condition.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_hicons/flutter_hicons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:liquid_glass_easy/liquid_glass_easy.dart';
 import 'package:provider/provider.dart';
 
 import '../Provider/theme_provider.dart';
@@ -165,12 +167,26 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
                     accent: accent,
                     card: card,
                     isDark: isDark,
-                    trailing: Switch(
+                    trailing: LiquidGlassToggle(
                       value: themeProvider.isDark,
                       activeColor: accent,
                       onChanged: (value) {
                         themeProvider.toggleTheme(value);
                       },
+                      style: LiquidGlassStyle(
+                        shape: LiquidGlassShape.squircle(
+                          cornerRadius: 20,
+                          borderType: OpticalBorder(
+                            borderSaturation: 1.8,
+                            ambientIntensity: 1.5,
+                          ),
+                        ),
+                        refraction: const LiquidGlassRefraction(
+                          distortion: 0.18,
+                          distortionWidth: 28,
+                          magnification: 1.08,
+                        ),
+                      ),
                     ),
                   ),
 
