@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:liquid_glass_easy/liquid_glass_easy.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -499,38 +500,44 @@ class _SearchScreenState extends State<SearchScreen> {
         .join(' ');
   }
 
-  Widget _glassChip({required IconData icon, required String text}) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(22.r),
-
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(.06),
-
-            borderRadius: BorderRadius.circular(22.r),
-
-            border: Border.all(color: Colors.white.withOpacity(.05)),
+  Widget _glassChip({
+    required IconData icon,
+    required String text,
+  }) {
+    return SizedBox(
+      height: 40.h,
+      child: LiquidGlassLens(
+        style: LiquidGlassStyle(
+          shape: LiquidGlassShape.squircle(
+            cornerRadius: 22.r,
           ),
-
+          appearance: LiquidGlassAppearance(
+            color: Colors.transparent.withOpacity(0.08),
+          ),
+          refraction: const LiquidGlassRefraction(
+            distortion: 0.08,
+            distortionWidth: 24,
+          ),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: 16.w,
+            vertical: 10.h,
+          ),
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: Colors.white70, size: 18.sp),
-
+              Icon(
+                icon,
+                color: Colors.white70,
+                size: 18.sp,
+              ),
               SizedBox(width: 8.w),
-
               Text(
                 text,
-
                 style: GoogleFonts.inter(
                   color: Colors.white,
-
                   fontWeight: FontWeight.w600,
-
                   fontSize: 12.sp,
                 ),
               ),
